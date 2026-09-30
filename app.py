@@ -78,6 +78,17 @@ def crear():
     conn.close()
     return jsonify(dict(fila)), 201
 
+@app.route("/avistamientos/resumen", methods=["GET"])
+def resumen():
+    conn = get_db()
+    filas = conn.execute(
+        "SELECT especie, COUNT(*) AS total "
+        "FROM avistamientos "
+        "GROUP BY especie COLLATE NOCASE "
+        "ORDER BY total DESC, especie"
+    ).fetchall()
+    conn.close()
+    return jsonify([dict(f) for f in filas]), 200
 
 
 @app.errorhandler(404)
