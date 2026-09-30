@@ -78,6 +78,8 @@ def crear():
     conn.close()
     return jsonify(dict(fila)), 201
 
+
+
 @app.errorhandler(404)
 def no_encontrado(e):
     return jsonify({"error": "Recurso no encontrado"}), 404
@@ -96,6 +98,44 @@ def obtener(id):
     if fila is None:
         return jsonify({"error": "Avistamiento no encontrado"}), 404
     return jsonify(dict(fila)), 200
+
+@app.route("/avistamientos/<int:id>", methods=["PUT"])
+def actualizar(id):
+    datos = request.get_json(silent=True)
+    conn = get_db()
+    if buscar(conn, id) is None:
+        conn.close()
+        return jsonify({"error": "Avistamiento no encontrado"}), 404
+
+    error = validar(datos)
+    if error:
+        conn.close()
+        return jsonify({"error": error}), 400
+
+    conn.execute(
+        "UPDATE avistamientos "
+        "SET especie = ?, lugar = ?, fecha = ?, observador = ? "
+        "WHERE id = ?",
+        (datos["especie"].strip(), datos["lugar"].strip(),
+         datos["fecha"], datos["observador"].strip(), id),
+    )
+    conn.commit()
+    fila = buscar(conn, id)
+    conn.close()
+    return jsonify(dict(fila)), 200
+
+
+@app.route("/avistamientos/<int:id>", methods=["DELETE"])
+def eliminar(id):
+    conn = get_db()
+    if buscar(conn, id) is None:
+        conn.close()
+        return jsonify({"error": "Avistamiento no encontrado"}), 404
+
+    conn.execute("DELETE FROM avistamientos WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return "", 204
 
 if __name__ == "__main__":
     init_db()
