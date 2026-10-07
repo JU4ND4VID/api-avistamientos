@@ -75,6 +75,8 @@ Los ejemplos usan `curl` y los archivos JSON de la carpeta `ejemplos/`, así fun
 
 > En Windows PowerShell usa `curl.exe` en lugar de `curl`. En CMD, Mac y Linux basta con `curl`. Ejecuta los comandos uno por uno.
 
+> Los ejemplos de ver, actualizar y eliminar usan el `id` 1. Ejecuta primero el de **Registrar** para que ese avistamiento exista.
+
 | Acción | Petición | Respuesta |
 |---|---|---|
 | Listar | `GET /avistamientos` | 200 con la lista |
@@ -150,7 +152,7 @@ Ejemplo de respuesta:
 
 ## Uso de IA
 
-Usé Claude (modelo Sonnet 5.5) como guía para construir el proyecto paso a paso. Revisé y probé cada endpoint, y entiendo el código que entrego.
+Se utilizo Claude (modelo Sonnet 5.5) como guía para construir el proyecto paso a paso y entendiendo todo el código.
 
 ## Autor
 
