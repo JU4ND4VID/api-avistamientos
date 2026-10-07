@@ -21,15 +21,33 @@ Está hecha con **Python + Flask** y guarda los datos en **SQLite** (base de dat
 
 ## Instalación
 
-**Windows (PowerShell):**
+**Windows (PowerShell o CMD):**
 
-```powershell
+```
 git clone https://github.com/JU4ND4VID/api-avistamientos.git
 cd api-avistamientos
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+```
+
+Activa el entorno según tu terminal:
+
+- PowerShell: `.venv\Scripts\Activate.ps1`
+- CMD: `.venv\Scripts\activate.bat`
+
+Verás `(.venv)` al inicio de la línea. Luego instala las dependencias:
+
+```
 pip install -r requirements.txt
 ```
+
+> Si PowerShell dice que la ejecución de scripts está deshabilitada, ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` y repite la activación.
+>
+> Alternativa sin activar el entorno (funciona aunque PowerShell bloquee scripts):
+>
+> ```
+> .venv\Scripts\python.exe -m pip install -r requirements.txt
+> .venv\Scripts\python.exe app.py
+> ```
 
 **Mac o Linux:**
 
@@ -55,7 +73,7 @@ Para detenerla, presiona `Ctrl + C`.
 
 Los ejemplos usan `curl` y los archivos JSON de la carpeta `ejemplos/`, así funcionan igual en cualquier sistema operativo. La opción `-i` muestra el código de estado.
 
-> En Windows PowerShell usa `curl.exe` en lugar de `curl`, y ejecuta los comandos uno por uno.
+> En Windows PowerShell usa `curl.exe` en lugar de `curl`. En CMD, Mac y Linux basta con `curl`. Ejecuta los comandos uno por uno.
 
 | Acción | Petición | Respuesta |
 |---|---|---|
