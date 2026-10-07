@@ -37,7 +37,7 @@ Activa el entorno según tu terminal:
 Verás `(.venv)` al inicio de la línea. Luego instala las dependencias:
 
 ```
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 > Si PowerShell dice que la ejecución de scripts está deshabilitada, ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` y repite la activación.
@@ -56,7 +56,7 @@ git clone https://github.com/JU4ND4VID/api-avistamientos.git
 cd api-avistamientos
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Ejecución
@@ -150,10 +150,26 @@ Ejemplo de respuesta:
 ]
 ```
 
+## Pruebas
+
+Las pruebas de integración cubren los seis endpoints y sus códigos de estado (200, 201, 204, 400 y 404). Cada prueba usa una base de datos temporal, así que no tocan los datos reales.
+
+```
+python -m pip install -r requirements-dev.txt
+python -m pytest -v
+```
+
 ## Uso de IA
 
-Se utilizo Claude (modelo Sonnet 5.5) como guía para construir el proyecto paso a paso y entendiendo todo el código.
+Para este trabajo se utilizó **Claude (modelo Sonnet 5.5)**, de Anthropic, como asistente: guió el desarrollo paso a paso y generó el código base de la API y de las pruebas. Se ejecutó el código, y se probó cada endpoint con `curl` (también en otra máquina) y se comprendio el funcionamiento de cada parte.
+
+## Referencias
+
+- Material de clase de ISW-2, Sesión 16 (REST, métodos HTTP, códigos de estado y JSON) y enunciado de la Sesión 17.
+- Documentación de Flask: https://flask.palletsprojects.com
+- Documentación del módulo `sqlite3` de Python: https://docs.python.org/3/library/sqlite3.html
+- Documentación de pytest: https://docs.pytest.org
 
 ## Autor
 
-Juan David Peña Cubillos. Universidad El Bosque, ISW-2.
+Juan David Peña Cubillos.
