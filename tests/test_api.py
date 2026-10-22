@@ -1,5 +1,7 @@
+from datetime import date, timedelta
 import pytest
 import app as api
+
 
 NUEVO = {
     "especie": "colibrí",
@@ -93,3 +95,66 @@ def test_resumen_cuenta_por_especie(client):
         {"especie": "colibrí", "total": 2},
         {"especie": "águila", "total": 1},
     ]
+def test_ruta_inexistente_responde_404_en_json(client):
+    # Arrange: una ruta que la API no define
+    # Act
+    r = client.get("/aves")
+    # Assert
+    assert r.status_code == 404
+    assert r.get_json() == {"error": "Recurso no encontrado"}
+
+
+def test_id_que_no_es_numero_responde_404_en_json(client):
+    # Act
+    r = client.get("/avistamientos/abc")
+    # Assert
+    assert r.status_code == 404
+    assert r.is_json
+
+
+def test_post_valido_y_luego_get_devuelve_el_mismo_avistamiento(client):
+    # Arrange
+    creado = crear(client).get_json()
+    # Act
+    r = client.get(f"/avistamientos/{creado['id']}")
+    # Assert
+    assert r.status_code == 200
+    assert r.get_json() == creado
+
+
+def test_post_con_especie_corta_responde_400_y_no_guarda_nada(client):
+    # Act
+    r = crear(client, {**NUEVO, "especie": "ab"})
+    # Assert
+    assert r.status_code == 400
+    assert "especie" in r.get_json()["detalles"]
+    assert client.get("/avistamientos").get_json() == []
+
+
+def test_post_con_fecha_futura_responde_400(client):
+    # Arrange: mañana calculado con el reloj real, así la prueba no caduca
+    manana = (date.today() + timedelta(days=1)).isoformat()
+    # Act
+    r = crear(client, {**NUEVO, "fecha": manana})
+    # Assert
+    assert r.status_code == 400
+    assert "fecha" in r.get_json()["detalles"]
+
+
+def test_put_valido_y_luego_get_muestra_los_cambios(client):
+    # Arrange
+    crear(client)
+    # Act
+    client.put("/avistamientos/1", json={**NUEVO, "lugar": "Chingaza"})
+    # Assert
+    assert client.get("/avistamientos/1").get_json()["lugar"] == "Chingaza"
+
+
+def test_put_invalido_no_modifica_el_avistamiento(client):
+    # Arrange
+    crear(client)
+    # Act
+    r = client.put("/avistamientos/1", json={**NUEVO, "especie": "ab"})
+    # Assert
+    assert r.status_code == 400
+    assert client.get("/avistamientos/1").get_json()["especie"] == "colibrí"

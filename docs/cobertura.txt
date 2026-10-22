@@ -2,9 +2,9 @@
 platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.7.0
 rootdir: C:\Users\aulainformatica\api-avistamientos
 plugins: cov-7.1.0
-collected 27 items
+collected 34 items
 
-tests\test_api.py ............                                           [ 44%]
+tests\test_api.py ...................                                    [ 55%]
 tests\test_validador.py ...............                                  [100%]
 
 =============================== tests coverage ================================
@@ -12,8 +12,8 @@ _______________ coverage: platform win32, python 3.14.6-final-0 _______________
 
 Name           Stmts   Miss Branch BrPart  Cover   Missing
 ----------------------------------------------------------
-app.py            88      4     12      1    95%   48, 143, 147-148
+app.py            88      3     12      1    96%   48, 147-148
 validador.py      40      1     10      0    98%   13
 ----------------------------------------------------------
-TOTAL            128      5     22      1    96%
-============================= 27 passed in 0.60s ==============================
+TOTAL            128      4     22      1    97%
+============================= 34 passed in 0.75s ==============================
