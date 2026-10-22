@@ -150,14 +150,36 @@ Ejemplo de respuesta:
 ]
 ```
 
+## Regla de validación
+
+Un avistamiento es válido si la especie tiene entre 3 y 50 caracteres, la fecha tiene el formato `AAAA-MM-DD` y no es posterior a hoy, y el lugar y el observador no están vacíos. Si no es válido, `POST` y `PUT` responden **400** con el campo que falló:
+
+```json
+{
+  "error": "Datos inválidos en: especie",
+  "detalles": { "especie": "debe ser texto de 3 a 50 caracteres" }
+}
+```
+
 ## Pruebas
 
-Las pruebas de integración cubren los seis endpoints y sus códigos de estado (200, 201, 204, 400 y 404). Cada prueba usa una base de datos temporal, así que no tocan los datos reales.
+- `tests/test_validador.py`: pruebas unitarias del validador, con un reloj fijo (stub).
+- `tests/test_api.py`: pruebas de integración de los endpoints por HTTP, con una base de datos temporal por prueba.
+
+Instalar las dependencias de desarrollo y correr las pruebas:
 
 ```
 python -m pip install -r requirements-dev.txt
 python -m pytest -v
 ```
+
+Generar la cobertura:
+
+```
+python -m pytest --cov=app --cov=validador --cov-branch --cov-report=term-missing
+```
+
+La justificación de las decisiones de pruebas está en [`docs/justificacion-pruebas.md`](docs/justificacion-pruebas.md) y el reporte de cobertura en `docs/cobertura.txt`.
 
 ## Uso de IA
 
