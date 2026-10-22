@@ -1,11 +1,11 @@
 import sqlite3
-from datetime import datetime
 from flask import Flask, jsonify, request
+from validador import ValidadorDeAvistamiento
 
 app = Flask(__name__)
 app.json.ensure_ascii = False
 DB_PATH = "avistamientos.db"
-CAMPOS = ["especie", "lugar", "fecha", "observador"]
+validador = ValidadorDeAvistamiento()
 
 
 def get_db():
@@ -29,19 +29,18 @@ def init_db():
     conn.close()
 
 
-def validar(datos):
-    """Devuelve un mensaje de error, o None si los datos son válidos."""
-    if not isinstance(datos, dict):
-        return "El cuerpo debe ser un objeto JSON"
-    faltan = [c for c in CAMPOS
-              if not isinstance(datos.get(c), str) or not datos[c].strip()]
-    if faltan:
-        return "Faltan datos o son inválidos: " + ", ".join(faltan)
-    try:
-        datetime.strptime(datos["fecha"], "%Y-%m-%d")
-    except ValueError:
-        return "La fecha debe tener el formato AAAA-MM-DD"
-    return None
+def buscar(conn, id):
+    return conn.execute(
+        "SELECT * FROM avistamientos WHERE id = ?", (id,)
+    ).fetchone()
+
+
+def error_validacion(errores):
+    campos = ", ".join(errores)
+    return jsonify({
+        "error": f"Datos inválidos en: {campos}",
+        "detalles": errores,
+    }), 400
 
 
 @app.route("/")
@@ -60,9 +59,9 @@ def listar():
 @app.route("/avistamientos", methods=["POST"])
 def crear():
     datos = request.get_json(silent=True)
-    error = validar(datos)
-    if error:
-        return jsonify({"error": error}), 400
+    errores = validador.validar(datos)
+    if errores:
+        return error_validacion(errores)
 
     conn = get_db()
     cur = conn.execute(
@@ -72,11 +71,10 @@ def crear():
          datos["fecha"], datos["observador"].strip()),
     )
     conn.commit()
-    fila = conn.execute(
-        "SELECT * FROM avistamientos WHERE id = ?", (cur.lastrowid,)
-    ).fetchone()
+    fila = buscar(conn, cur.lastrowid)
     conn.close()
     return jsonify(dict(fila)), 201
+
 
 @app.route("/avistamientos/resumen", methods=["GET"])
 def resumen():
@@ -91,16 +89,6 @@ def resumen():
     return jsonify([dict(f) for f in filas]), 200
 
 
-@app.errorhandler(404)
-def no_encontrado(e):
-    return jsonify({"error": "Recurso no encontrado"}), 404
-
-def buscar(conn, id):
-    return conn.execute(
-        "SELECT * FROM avistamientos WHERE id = ?", (id,)
-    ).fetchone()
-
-
 @app.route("/avistamientos/<int:id>", methods=["GET"])
 def obtener(id):
     conn = get_db()
@@ -110,6 +98,7 @@ def obtener(id):
         return jsonify({"error": "Avistamiento no encontrado"}), 404
     return jsonify(dict(fila)), 200
 
+
 @app.route("/avistamientos/<int:id>", methods=["PUT"])
 def actualizar(id):
     datos = request.get_json(silent=True)
@@ -118,10 +107,10 @@ def actualizar(id):
         conn.close()
         return jsonify({"error": "Avistamiento no encontrado"}), 404
 
-    error = validar(datos)
-    if error:
+    errores = validador.validar(datos)
+    if errores:
         conn.close()
-        return jsonify({"error": error}), 400
+        return error_validacion(errores)
 
     conn.execute(
         "UPDATE avistamientos "
@@ -147,6 +136,12 @@ def eliminar(id):
     conn.commit()
     conn.close()
     return "", 204
+
+
+@app.errorhandler(404)
+def no_encontrado(e):
+    return jsonify({"error": "Recurso no encontrado"}), 404
+
 
 if __name__ == "__main__":
     init_db()
