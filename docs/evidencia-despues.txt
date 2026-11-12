@@ -1,0 +1,141 @@
+# EVIDENCIA DESPUÉS DEL REFACTOR (Clean Architecture)
+
+$ python -m pytest -v --cov=avistamientos --cov-branch --cov-report=term-missing
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.2.0, pluggy-1.7.0 -- /tmp/claude-0/-home-claude/b5609296-7f7b-5d70-b528-ceae6c4168ab/scratchpad/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <proyecto>
+plugins: cov-7.1.0
+collecting ... collected 61 items
+
+tests/test_api.py::test_listar_vacio PASSED                              [  1%]
+tests/test_api.py::test_crear_devuelve_201 PASSED                        [  3%]
+tests/test_api.py::test_crear_incompleto_devuelve_400 PASSED             [  4%]
+tests/test_api.py::test_crear_fecha_invalida_devuelve_400 PASSED         [  6%]
+tests/test_api.py::test_obtener_existente_devuelve_200 PASSED            [  8%]
+tests/test_api.py::test_obtener_inexistente_devuelve_404 PASSED          [  9%]
+tests/test_api.py::test_actualizar_devuelve_200 PASSED                   [ 11%]
+tests/test_api.py::test_actualizar_inexistente_devuelve_404 PASSED       [ 13%]
+tests/test_api.py::test_actualizar_incompleto_devuelve_400 PASSED        [ 14%]
+tests/test_api.py::test_eliminar_devuelve_204_y_luego_404 PASSED         [ 16%]
+tests/test_api.py::test_eliminar_inexistente_devuelve_404 PASSED         [ 18%]
+tests/test_api.py::test_resumen_cuenta_por_especie PASSED                [ 19%]
+tests/test_api.py::test_ruta_inexistente_responde_404_en_json PASSED     [ 21%]
+tests/test_api.py::test_id_que_no_es_numero_responde_404_en_json PASSED  [ 22%]
+tests/test_api.py::test_post_valido_y_luego_get_devuelve_el_mismo_avistamiento PASSED [ 24%]
+tests/test_api.py::test_post_con_especie_corta_responde_400_y_no_guarda_nada PASSED [ 26%]
+tests/test_api.py::test_post_con_fecha_futura_responde_400 PASSED        [ 27%]
+tests/test_api.py::test_put_valido_y_luego_get_muestra_los_cambios PASSED [ 29%]
+tests/test_api.py::test_put_invalido_no_modifica_el_avistamiento PASSED  [ 31%]
+tests/test_arquitectura.py::test_ningun_circulo_importa_de_un_circulo_mas_externo[domain] PASSED [ 32%]
+tests/test_arquitectura.py::test_ningun_circulo_importa_de_un_circulo_mas_externo[application] PASSED [ 34%]
+tests/test_arquitectura.py::test_ningun_circulo_importa_de_un_circulo_mas_externo[adapters] PASSED [ 36%]
+tests/test_arquitectura.py::test_dominio_y_aplicacion_no_conocen_flask_ni_sqlite[domain] PASSED [ 37%]
+tests/test_arquitectura.py::test_dominio_y_aplicacion_no_conocen_flask_ni_sqlite[application] PASSED [ 39%]
+tests/test_arquitectura.py::test_solo_el_repositorio_sqlite_usa_sqlite PASSED [ 40%]
+tests/test_arquitectura.py::test_solo_el_circulo_de_frameworks_usa_flask PASSED [ 42%]
+tests/test_casos_de_uso.py::test_registrar_valido_guarda_y_devuelve_con_id PASSED [ 44%]
+tests/test_casos_de_uso.py::test_registrar_quita_espacios_sobrantes PASSED [ 45%]
+tests/test_casos_de_uso.py::test_registrar_invalido_lanza_error_y_no_guarda PASSED [ 47%]
+tests/test_casos_de_uso.py::test_obtener_inexistente_lanza_no_encontrado PASSED [ 49%]
+tests/test_casos_de_uso.py::test_actualizar_inexistente_se_reporta_antes_que_los_datos_invalidos PASSED [ 50%]
+tests/test_casos_de_uso.py::test_actualizar_valido_reemplaza_los_datos PASSED [ 52%]
+tests/test_casos_de_uso.py::test_actualizar_invalido_no_modifica PASSED  [ 54%]
+tests/test_casos_de_uso.py::test_eliminar_existente_y_luego_inexistente PASSED [ 55%]
+tests/test_casos_de_uso.py::test_resumen_delega_en_el_repositorio PASSED [ 57%]
+tests/test_controlador.py::test_crear_valido_responde_201_con_id PASSED  [ 59%]
+tests/test_controlador.py::test_crear_invalido_responde_400_con_detalles PASSED [ 60%]
+tests/test_controlador.py::test_obtener_inexistente_responde_404 PASSED  [ 62%]
+tests/test_controlador.py::test_eliminar_responde_204_sin_cuerpo_y_luego_404 PASSED [ 63%]
+tests/test_controlador.py::test_actualizar_inexistente_responde_404_aunque_los_datos_sean_invalidos PASSED [ 65%]
+tests/test_controlador.py::test_listar_y_resumen_devuelven_listas_de_diccionarios PASSED [ 67%]
+tests/test_repositorio_sqlite.py::test_guardar_asigna_id_y_obtener_lo_devuelve PASSED [ 68%]
+tests/test_repositorio_sqlite.py::test_obtener_inexistente_devuelve_none PASSED [ 70%]
+tests/test_repositorio_sqlite.py::test_actualizar_y_eliminar PASSED      [ 72%]
+tests/test_repositorio_sqlite.py::test_resumen_agrupa_sin_distinguir_mayusculas_y_ordena PASSED [ 73%]
+tests/test_repositorio_sqlite.py::test_crear_esquema_es_idempotente PASSED [ 75%]
+tests/test_validador.py::test_datos_completos_y_correctos_no_producen_errores PASSED [ 77%]
+tests/test_validador.py::test_especie_de_2_caracteres_se_rechaza PASSED  [ 78%]
+tests/test_validador.py::test_especie_de_3_caracteres_se_acepta PASSED   [ 80%]
+tests/test_validador.py::test_especie_de_50_caracteres_se_acepta PASSED  [ 81%]
+tests/test_validador.py::test_especie_de_51_caracteres_se_rechaza PASSED [ 83%]
+tests/test_validador.py::test_especie_de_solo_espacios_se_rechaza PASSED [ 85%]
+tests/test_validador.py::test_especie_que_no_es_texto_se_rechaza PASSED  [ 86%]
+tests/test_validador.py::test_fecha_de_hoy_se_acepta PASSED              [ 88%]
+tests/test_validador.py::test_fecha_de_manana_se_rechaza PASSED          [ 90%]
+tests/test_validador.py::test_fecha_con_formato_incorrecto_se_rechaza PASSED [ 91%]
+tests/test_validador.py::test_fecha_que_no_existe_se_rechaza PASSED      [ 93%]
+tests/test_validador.py::test_lugar_vacio_se_rechaza PASSED              [ 95%]
+tests/test_validador.py::test_observador_vacio_se_rechaza PASSED         [ 96%]
+tests/test_validador.py::test_cuerpo_que_no_es_un_objeto_se_rechaza PASSED [ 98%]
+tests/test_validador.py::test_reporta_todos_los_campos_que_fallan PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.18-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+avistamientos/__init__.py                          0      0      0      0   100%
+avistamientos/adapters/__init__.py                 0      0      0      0   100%
+avistamientos/adapters/controlador.py             39      0      0      0   100%
+avistamientos/adapters/presentador.py             22      0      0      0   100%
+avistamientos/adapters/reloj_sistema.py            5      0      0      0   100%
+avistamientos/adapters/repositorio_sqlite.py      47      0      0      0   100%
+avistamientos/application/__init__.py              0      0      0      0   100%
+avistamientos/application/casos_de_uso.py         51      0     10      0   100%
+avistamientos/application/dto.py                   5      0      0      0   100%
+avistamientos/application/errores.py               8      0      0      0   100%
+avistamientos/application/puertos.py               7      0      0      0   100%
+avistamientos/domain/__init__.py                   0      0      0      0   100%
+avistamientos/domain/avistamiento.py              12      0      0      0   100%
+avistamientos/domain/validador.py                 36      0     10      0   100%
+avistamientos/frameworks/__init__.py               0      0      0      0   100%
+avistamientos/frameworks/web_flask.py             45      1      2      0    98%   47
+------------------------------------------------------------------------------------------
+TOTAL                                            277      1     22      0    99%
+============================== 61 passed in 0.55s ==============================
+
+$ python scripts/muestra_api.py
+GET /
+  -> 200 {"mensaje": "API de avistamientos funcionando"}
+GET /avistamientos (vacío)
+  -> 200 []
+POST /avistamientos (válido)
+  -> 201 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (válido, otra especie)
+  -> 201 {"especie": "águila", "fecha": "2026-09-29", "id": 2, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (colibrí otra vez)
+  -> 201 {"especie": "colibrí", "fecha": "2026-09-29", "id": 3, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (incompleto)
+  -> 400 {"detalles": {"fecha": "debe tener el formato AAAA-MM-DD", "lugar": "no puede estar vacío", "observador": "no puede estar vacío"}, "error": "Datos inválidos en: fecha, lugar, observador"}
+POST /avistamientos (fecha futura)
+  -> 400 {"detalles": {"fecha": "no puede ser posterior a hoy"}, "error": "Datos inválidos en: fecha"}
+POST /avistamientos (fecha irreal)
+  -> 400 {"detalles": {"fecha": "no es una fecha real (revise mes y día)"}, "error": "Datos inválidos en: fecha"}
+POST /avistamientos (cuerpo no JSON)
+  -> 400 {"detalles": {"cuerpo": "debe ser un objeto JSON"}, "error": "Datos inválidos en: cuerpo"}
+GET /avistamientos
+  -> 200 [{"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}, {"especie": "águila", "fecha": "2026-09-29", "id": 2, "lugar": "Jardín Botánico", "observador": "Peña"}, {"especie": "colibrí", "fecha": "2026-09-29", "id": 3, "lugar": "Jardín Botánico", "observador": "Peña"}]
+GET /avistamientos/1
+  -> 200 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}
+GET /avistamientos/999
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /avistamientos/abc
+  -> 404 {"error": "Recurso no encontrado"}
+PUT /avistamientos/1 (válido)
+  -> 200 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Chingaza", "observador": "Peña"}
+PUT /avistamientos/1 (inválido)
+  -> 400 {"detalles": {"especie": "debe ser texto de 3 a 50 caracteres"}, "error": "Datos inválidos en: especie"}
+PUT /avistamientos/999 (inexistente, cuerpo inválido)
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /avistamientos/resumen
+  -> 200 [{"especie": "colibrí", "total": 2}, {"especie": "águila", "total": 1}]
+DELETE /avistamientos/2
+  -> 204 
+DELETE /avistamientos/2 (otra vez)
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /ruta-que-no-existe
+  -> 404 {"error": "Recurso no encontrado"}
+
+$ diff <muestra del antes> <muestra del después>
+(sin diferencias: la API responde igual)

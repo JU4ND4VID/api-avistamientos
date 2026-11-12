@@ -1,0 +1,30 @@
+flowchart TB
+  subgraph FW["4. Frameworks y drivers (círculo exterior)"]
+    web["web_flask.py<br/>rutas Flask + raíz de composición"]
+  end
+  subgraph AD["3. Adaptadores de interfaz"]
+    ctrl["controlador.py"]
+    pres["presentador.py"]
+    repo["repositorio_sqlite.py<br/>(único con SQL)"]
+    reloj["reloj_sistema.py"]
+  end
+  subgraph UC["2. Casos de uso"]
+    cu["casos_de_uso.py"]
+    puerto["puertos.py<br/>«interfaz» RepositorioAvistamientos"]
+  end
+  subgraph EN["1. Entidades (centro)"]
+    ent["avistamiento.py"]
+    val["validador.py<br/>+ «interfaz» Reloj"]
+  end
+  web --> ctrl
+  web -. "construye e inyecta" .-> repo
+  web -. "construye e inyecta" .-> reloj
+  ctrl --> cu
+  ctrl --> pres
+  cu --> puerto
+  cu --> ent
+  cu --> val
+  pres --> ent
+  repo ==>|implementa| puerto
+  reloj ==>|implementa| val
+  repo --> ent

@@ -161,10 +161,28 @@ Un avistamiento es válido si la especie tiene entre 3 y 50 caracteres, la fecha
 }
 ```
 
+## Arquitectura
+
+El código sigue **Clean Architecture** (Martin, 2012). Las dependencias solo apuntan hacia adentro:
+
+```
+avistamientos/
+├── domain/        entidad Avistamiento y regla de validación
+├── application/   casos de uso y puerto RepositorioAvistamientos
+├── adapters/      controlador, presentador, repositorio SQLite, reloj del sistema
+└── frameworks/    rutas Flask y raíz de composición (crear_app)
+```
+
+`app.py` solo arranca la API. El diagrama, la investigación y la evidencia del refactor
+están en [`docs/taller5-clean-architecture.md`](docs/taller5-clean-architecture.md).
+
 ## Pruebas
 
-- `tests/test_validador.py`: pruebas unitarias del validador, con un reloj fijo (stub).
-- `tests/test_api.py`: pruebas de integración de los endpoints por HTTP, con una base de datos temporal por prueba.
+- `tests/test_validador.py`: unitarias del validador, con un reloj fijo (stub).
+- `tests/test_api.py`: integración de los endpoints por HTTP, con una base de datos temporal por prueba.
+- `tests/test_casos_de_uso.py` y `tests/test_controlador.py`: casos de uso y controlador con un repositorio en memoria, sin Flask ni SQLite.
+- `tests/test_repositorio_sqlite.py`: integración del repositorio contra SQLite temporal.
+- `tests/test_arquitectura.py`: verifica la regla de dependencia leyendo los imports.
 
 Instalar las dependencias de desarrollo y correr las pruebas:
 
@@ -176,10 +194,11 @@ python -m pytest -v
 Generar la cobertura:
 
 ```
-python -m pytest --cov=app --cov=validador --cov-branch --cov-report=term-missing
+python -m pytest --cov=avistamientos --cov-branch --cov-report=term-missing
 ```
 
-La justificación de las decisiones de pruebas está en [`docs/justificacion-pruebas.md`](docs/justificacion-pruebas.md) y el reporte de cobertura en `docs/cobertura.txt`.
+La justificación de las decisiones de pruebas está en [`docs/justificacion-pruebas.md`](docs/justificacion-pruebas.md);
+la evidencia antes y después del refactor, en `docs/evidencia-antes.txt` y `docs/evidencia-despues.txt`.
 
 ## Uso de IA
 
@@ -191,6 +210,7 @@ Para este trabajo se utilizó **Claude (modelo Sonnet 5.5)**, de Anthropic, como
 - Documentación de Flask: https://flask.palletsprojects.com
 - Documentación del módulo `sqlite3` de Python: https://docs.python.org/3/library/sqlite3.html
 - Documentación de pytest: https://docs.pytest.org
+- Martin, R. C. (2012). The Clean Architecture. https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
 ## Autor
 
