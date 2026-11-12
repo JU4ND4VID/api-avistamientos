@@ -1,11 +1,12 @@
 import sqlite3
 from flask import Flask, jsonify, request
-from validador import ValidadorDeAvistamiento
+from avistamientos.adapters.reloj_sistema import RelojSistema
+from avistamientos.domain.validador import ValidadorDeAvistamiento
 
 app = Flask(__name__)
 app.json.ensure_ascii = False
 DB_PATH = "avistamientos.db"
-validador = ValidadorDeAvistamiento()
+validador = ValidadorDeAvistamiento(RelojSistema())
 
 
 def get_db():

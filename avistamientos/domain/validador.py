@@ -1,4 +1,11 @@
+"""Regla de validación de un avistamiento (regla de negocio, círculo de dominio).
+
+No importa Flask, sqlite3 ni nada de los círculos exteriores. Lo único externo
+que necesita, saber qué día es hoy, lo pide por medio de la interfaz `Reloj`,
+que implementa quien use el validador (inversión de dependencias).
+"""
 import re
+from abc import ABC, abstractmethod
 from datetime import date, datetime
 
 ESPECIE_MIN = 3
@@ -6,23 +13,17 @@ ESPECIE_MAX = 50
 FORMATO_FECHA = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
 
-class Reloj:
+class Reloj(ABC):
     """Interfaz: quien la implemente dice qué día es hoy."""
 
+    @abstractmethod
     def hoy(self) -> date:
-        raise NotImplementedError
-
-
-class RelojSistema(Reloj):
-    """Implementación real: usa el reloj del computador."""
-
-    def hoy(self) -> date:
-        return date.today()
+        ...
 
 
 class ValidadorDeAvistamiento:
-    def __init__(self, reloj=None):
-        self.reloj = reloj or RelojSistema()
+    def __init__(self, reloj: Reloj):
+        self.reloj = reloj
 
     def validar(self, datos):
         """Devuelve un dict {campo: mensaje}. Vacío si los datos son válidos."""
