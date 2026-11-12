@@ -1,0 +1,97 @@
+# EVIDENCIA ANTES DEL REFACTOR (monolito: app.py + validador.py)
+
+$ python -m pytest -v --cov=app --cov=validador --cov-branch --cov-report=term-missing
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.2.0, pluggy-1.7.0 -- /tmp/claude-0/-home-claude/b5609296-7f7b-5d70-b528-ceae6c4168ab/scratchpad/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <proyecto>
+plugins: cov-7.1.0
+collecting ... collected 34 items
+
+tests/test_api.py::test_listar_vacio PASSED                              [  2%]
+tests/test_api.py::test_crear_devuelve_201 PASSED                        [  5%]
+tests/test_api.py::test_crear_incompleto_devuelve_400 PASSED             [  8%]
+tests/test_api.py::test_crear_fecha_invalida_devuelve_400 PASSED         [ 11%]
+tests/test_api.py::test_obtener_existente_devuelve_200 PASSED            [ 14%]
+tests/test_api.py::test_obtener_inexistente_devuelve_404 PASSED          [ 17%]
+tests/test_api.py::test_actualizar_devuelve_200 PASSED                   [ 20%]
+tests/test_api.py::test_actualizar_inexistente_devuelve_404 PASSED       [ 23%]
+tests/test_api.py::test_actualizar_incompleto_devuelve_400 PASSED        [ 26%]
+tests/test_api.py::test_eliminar_devuelve_204_y_luego_404 PASSED         [ 29%]
+tests/test_api.py::test_eliminar_inexistente_devuelve_404 PASSED         [ 32%]
+tests/test_api.py::test_resumen_cuenta_por_especie PASSED                [ 35%]
+tests/test_api.py::test_ruta_inexistente_responde_404_en_json PASSED     [ 38%]
+tests/test_api.py::test_id_que_no_es_numero_responde_404_en_json PASSED  [ 41%]
+tests/test_api.py::test_post_valido_y_luego_get_devuelve_el_mismo_avistamiento PASSED [ 44%]
+tests/test_api.py::test_post_con_especie_corta_responde_400_y_no_guarda_nada PASSED [ 47%]
+tests/test_api.py::test_post_con_fecha_futura_responde_400 PASSED        [ 50%]
+tests/test_api.py::test_put_valido_y_luego_get_muestra_los_cambios PASSED [ 52%]
+tests/test_api.py::test_put_invalido_no_modifica_el_avistamiento PASSED  [ 55%]
+tests/test_validador.py::test_datos_completos_y_correctos_no_producen_errores PASSED [ 58%]
+tests/test_validador.py::test_especie_de_2_caracteres_se_rechaza PASSED  [ 61%]
+tests/test_validador.py::test_especie_de_3_caracteres_se_acepta PASSED   [ 64%]
+tests/test_validador.py::test_especie_de_50_caracteres_se_acepta PASSED  [ 67%]
+tests/test_validador.py::test_especie_de_51_caracteres_se_rechaza PASSED [ 70%]
+tests/test_validador.py::test_especie_de_solo_espacios_se_rechaza PASSED [ 73%]
+tests/test_validador.py::test_especie_que_no_es_texto_se_rechaza PASSED  [ 76%]
+tests/test_validador.py::test_fecha_de_hoy_se_acepta PASSED              [ 79%]
+tests/test_validador.py::test_fecha_de_manana_se_rechaza PASSED          [ 82%]
+tests/test_validador.py::test_fecha_con_formato_incorrecto_se_rechaza PASSED [ 85%]
+tests/test_validador.py::test_fecha_que_no_existe_se_rechaza PASSED      [ 88%]
+tests/test_validador.py::test_lugar_vacio_se_rechaza PASSED              [ 91%]
+tests/test_validador.py::test_observador_vacio_se_rechaza PASSED         [ 94%]
+tests/test_validador.py::test_cuerpo_que_no_es_un_objeto_se_rechaza PASSED [ 97%]
+tests/test_validador.py::test_reporta_todos_los_campos_que_fallan PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.13.18-final-0 _______________
+
+Name           Stmts   Miss Branch BrPart  Cover   Missing
+----------------------------------------------------------
+app.py            88      3     12      1    96%   48, 147-148
+validador.py      40      1     10      0    98%   13
+----------------------------------------------------------
+TOTAL            128      4     22      1    97%
+============================== 34 passed in 0.34s ==============================
+
+$ python scripts/muestra_api.py
+GET /
+  -> 200 {"mensaje": "API de avistamientos funcionando"}
+GET /avistamientos (vacío)
+  -> 200 []
+POST /avistamientos (válido)
+  -> 201 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (válido, otra especie)
+  -> 201 {"especie": "águila", "fecha": "2026-09-29", "id": 2, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (colibrí otra vez)
+  -> 201 {"especie": "colibrí", "fecha": "2026-09-29", "id": 3, "lugar": "Jardín Botánico", "observador": "Peña"}
+POST /avistamientos (incompleto)
+  -> 400 {"detalles": {"fecha": "debe tener el formato AAAA-MM-DD", "lugar": "no puede estar vacío", "observador": "no puede estar vacío"}, "error": "Datos inválidos en: fecha, lugar, observador"}
+POST /avistamientos (fecha futura)
+  -> 400 {"detalles": {"fecha": "no puede ser posterior a hoy"}, "error": "Datos inválidos en: fecha"}
+POST /avistamientos (fecha irreal)
+  -> 400 {"detalles": {"fecha": "no es una fecha real (revise mes y día)"}, "error": "Datos inválidos en: fecha"}
+POST /avistamientos (cuerpo no JSON)
+  -> 400 {"detalles": {"cuerpo": "debe ser un objeto JSON"}, "error": "Datos inválidos en: cuerpo"}
+GET /avistamientos
+  -> 200 [{"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}, {"especie": "águila", "fecha": "2026-09-29", "id": 2, "lugar": "Jardín Botánico", "observador": "Peña"}, {"especie": "colibrí", "fecha": "2026-09-29", "id": 3, "lugar": "Jardín Botánico", "observador": "Peña"}]
+GET /avistamientos/1
+  -> 200 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Jardín Botánico", "observador": "Peña"}
+GET /avistamientos/999
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /avistamientos/abc
+  -> 404 {"error": "Recurso no encontrado"}
+PUT /avistamientos/1 (válido)
+  -> 200 {"especie": "colibrí", "fecha": "2026-09-29", "id": 1, "lugar": "Chingaza", "observador": "Peña"}
+PUT /avistamientos/1 (inválido)
+  -> 400 {"detalles": {"especie": "debe ser texto de 3 a 50 caracteres"}, "error": "Datos inválidos en: especie"}
+PUT /avistamientos/999 (inexistente, cuerpo inválido)
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /avistamientos/resumen
+  -> 200 [{"especie": "colibrí", "total": 2}, {"especie": "águila", "total": 1}]
+DELETE /avistamientos/2
+  -> 204 
+DELETE /avistamientos/2 (otra vez)
+  -> 404 {"error": "Avistamiento no encontrado"}
+GET /ruta-que-no-existe
+  -> 404 {"error": "Recurso no encontrado"}
