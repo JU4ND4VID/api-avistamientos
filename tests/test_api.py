@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 import pytest
-import app as api
+from avistamientos.frameworks.web_flask import crear_app
 
 
 NUEVO = {
@@ -12,12 +12,11 @@ NUEVO = {
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
+def client(tmp_path):
     # Cada prueba usa una base de datos temporal, vacía y aparte de la real
-    monkeypatch.setattr(api, "DB_PATH", str(tmp_path / "test.db"))
-    api.init_db()
-    api.app.config["TESTING"] = True
-    return api.app.test_client()
+    app = crear_app(str(tmp_path / "test.db"))
+    app.config["TESTING"] = True
+    return app.test_client()
 
 
 def crear(client, datos=None):
